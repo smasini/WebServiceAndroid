@@ -38,11 +38,13 @@ public abstract class Operation {
             switch (getMethodType()){
                 case GET:
                     Uri.Builder builder = uri.buildUpon();
-                    Iterator it = getParams().entrySet().iterator();
-                    while (it.hasNext()) {
-                        Map.Entry pair = (Map.Entry) it.next();
-                        builder.appendQueryParameter(pair.getKey().toString(), pair.getValue().toString());
-                        it.remove();
+                    if(getParams()!=null){
+                        Iterator it = getParams().entrySet().iterator();
+                        while (it.hasNext()) {
+                            Map.Entry pair = (Map.Entry) it.next();
+                            builder.appendQueryParameter(pair.getKey().toString(), pair.getValue().toString());
+                            it.remove();
+                        }
                     }
                     URL myUrl = new URL(builder.toString());
                     connection = (HttpURLConnection) myUrl.openConnection();
@@ -54,11 +56,13 @@ public abstract class Operation {
                     connection.setRequestMethod("POST");
 
                     JSONObject jsonObject = new JSONObject();
-                    it = getParams().entrySet().iterator();
-                    while (it.hasNext()) {
-                        Map.Entry pair = (Map.Entry) it.next();
-                        jsonObject.put((String)pair.getKey(),pair.getValue());
-                        it.remove();
+                    if(getParams()!=null){
+                        Iterator it = getParams().entrySet().iterator();
+                        while (it.hasNext()) {
+                            Map.Entry pair = (Map.Entry) it.next();
+                            jsonObject.put((String)pair.getKey(),pair.getValue());
+                            it.remove();
+                        }
                     }
                     OutputStream os = connection.getOutputStream();
                     BufferedWriter writer = new BufferedWriter(
