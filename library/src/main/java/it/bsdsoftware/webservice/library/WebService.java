@@ -11,7 +11,7 @@ public class WebService {
 
     public static WebService getInstance(){
         if(instance == null){
-            throw new RuntimeException("Istanza non inizializzata! Assicurati di chiamare il metodo 'init' all'avvio dell'applicazione");
+            throw new RuntimeException("WebService: Istanza non inizializzata! Assicurati di chiamare il metodo 'init' all'avvio dell'applicazione");
         }
         return instance;
     }
