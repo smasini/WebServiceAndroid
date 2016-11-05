@@ -31,7 +31,9 @@ import cz.msebera.android.httpclient.entity.mime.content.FileBody;
  */
 public abstract class Operation {
 
-
+    public WebServiceTaskResult onSuccess(String response){
+        return WebServiceTaskResult.ok;
+    }
     public abstract WebServiceTaskResult onSuccess(int statusCode, InputStream inputStream);
     public abstract MethodType getMethodType();
     public abstract String getUrlComplete(String baseUrl);
@@ -94,11 +96,13 @@ public abstract class Operation {
 
     public HttpURLConnection setHeaders(HttpURLConnection connection){
         HashMap<String, String> headers = getHeaders();
-        Iterator it = headers.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            connection.addRequestProperty(pair.getKey().toString(), pair.getValue().toString());
-            it.remove();
+        if(headers!=null) {
+            Iterator it = headers.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                connection.addRequestProperty(pair.getKey().toString(), pair.getValue().toString());
+                it.remove();
+            }
         }
         return connection;
     }

@@ -1,7 +1,6 @@
 package it.bsdsoftware.webservice;
 
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.HashMap;
 
 import it.bsdsoftware.webservice.library.MethodType;
@@ -30,9 +29,10 @@ public class MyOperation extends Operation {
     }
 
     @Override
-    public HttpURLConnection setHeders(HttpURLConnection connection) {
+    public HashMap<String, String> getHeaders() {
         return null;
     }
+
 
     @Override
     public HashMap<String, String> getParams() {

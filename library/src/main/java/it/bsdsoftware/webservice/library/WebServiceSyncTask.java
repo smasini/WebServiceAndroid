@@ -17,6 +17,7 @@ import cz.msebera.android.httpclient.client.methods.HttpPost;
 import cz.msebera.android.httpclient.impl.client.CloseableHttpClient;
 import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
+import cz.msebera.android.httpclient.util.EntityUtils;
 
 /**
  * Created by Simone Masini on 03/09/2016.
@@ -55,19 +56,23 @@ public class WebServiceSyncTask {
 
     public WebServiceTaskResult getResultUploading(Operation operation){
         HttpResponse response = null;
+        String responseString = "";
         String url = operation.getUrlComplete(WebService.getInstance().getUrl());
         HttpPost httppost = new HttpPost(url);
         httppost.setEntity(operation.getHttpEntity());
         HashMap<String, String> headers = operation.getHeaders();
-        Iterator it = headers.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            httppost.setHeader(pair.getKey().toString(), pair.getValue().toString());
-            it.remove();
+        if(headers!=null) {
+            Iterator it = headers.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                httppost.setHeader(pair.getKey().toString(), pair.getValue().toString());
+                it.remove();
+            }
         }
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
                 response = httpClient.execute(httppost);
+                responseString = EntityUtils.toString(response.getEntity());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -75,12 +80,13 @@ public class WebServiceSyncTask {
             HttpClient httpclient = new DefaultHttpClient();
             try {
                 response = httpclient.execute(httppost);
+                responseString = EntityUtils.toString(response.getEntity());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         if(response!=null){
-            return WebServiceTaskResult.ok;
+            return operation.onSuccess(responseString);
         }
         return WebServiceTaskResult.fail("Error");
     }
