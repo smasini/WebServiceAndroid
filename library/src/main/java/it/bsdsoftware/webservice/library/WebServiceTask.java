@@ -56,7 +56,12 @@ public class WebServiceTask extends AsyncTask<Void, Integer, WebServiceTaskResul
     protected WebServiceTaskResult doInBackground(Void... params) {
         WebServiceSyncTask webServiceSyncTask = new WebServiceSyncTask();
         for(Operation operation : operations){
-            WebServiceTaskResult result = webServiceSyncTask.getResult(operation);
+            WebServiceTaskResult result;
+            if(operation.isUploadingImage()){
+                result = webServiceSyncTask.getResultUploading(operation);
+            }else{
+                result = webServiceSyncTask.getResult(operation);
+            }
             if(result!=null){
                 if(result.result || this.result == null){
                     this.result = result;
