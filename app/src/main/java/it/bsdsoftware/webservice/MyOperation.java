@@ -35,7 +35,7 @@ public class MyOperation extends Operation {
 
 
     @Override
-    public HashMap<String, String> getParams() {
+    public HashMap<String, Object> getParams() {
         return null;
     }
 }
