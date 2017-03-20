@@ -47,7 +47,7 @@ publish {
     userOrg = 'smasini'
     groupId = 'it.smasini'
     artifactId = 'android-webservice'
-    publishVersion = '1.3'
+    publishVersion = '1.5'
     website = 'https://github.com/smasini/WebServiceAndroid'
     repository = 'https://github.com/smasini/WebServiceAndroid.git'
     bintrayUser = 'smasini'
