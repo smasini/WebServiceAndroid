@@ -6,5 +6,5 @@ package it.bsdsoftware.webservice.library;
 
 public interface Cachable {
     boolean isDataAlreadyCached();
-    void setCacheData(WebServiceTaskResult result);
+    void setCacheData();
 }

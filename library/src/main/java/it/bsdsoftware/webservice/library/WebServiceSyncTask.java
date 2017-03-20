@@ -44,7 +44,7 @@ public class WebServiceSyncTask {
             }
             if(result != null && result.result && operation instanceof Cachable){
                 Cachable cachable = (Cachable)operation;
-                cachable.setCacheData(result);
+                cachable.setCacheData();
             }
         } catch (Throwable t) {
             InputStream errorStream = null;
