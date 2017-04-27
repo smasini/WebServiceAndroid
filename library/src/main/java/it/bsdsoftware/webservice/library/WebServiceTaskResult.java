@@ -5,12 +5,10 @@ package it.bsdsoftware.webservice.library;
  */
 public class WebServiceTaskResult<T> {
 
-    public final boolean result;
-    public final String message;
-    public final Throwable exception;
-    public T data;
-
-    public static WebServiceTaskResult<?> ok = new WebServiceTaskResult(true);
+    private final String message;
+    private final Throwable exception;
+    private final TaskResult taskResult;
+    private T data;
 
     public static WebServiceTaskResult fail(String msg) {
         return fail(null, msg);
@@ -21,35 +19,41 @@ public class WebServiceTaskResult<T> {
     }
 
     public static WebServiceTaskResult fail(Throwable t, String msg) {
-        return new WebServiceTaskResult(false, msg, t);
+        return new WebServiceTaskResult(TaskResult.FAIL, msg, t);
+    }
+
+    public static WebServiceTaskResult success(){
+        return success(null);
     }
 
     public static WebServiceTaskResult success(String msg){
-        return new WebServiceTaskResult(true, msg);
+        return new WebServiceTaskResult(TaskResult.SUCCESS, msg);
     }
 
-    private WebServiceTaskResult(boolean result, String msg, Throwable t) {
-        this.result = result;
-        this.message = msg;
-        this.exception = t;
+    public static WebServiceTaskResult cached() {
+        return new WebServiceTaskResult(TaskResult.CACHED);
     }
 
     public WebServiceTaskResult(T data){
-        this(true);
+        this(TaskResult.SUCCESS);
         this.data = data;
     }
 
     public WebServiceTaskResult(T data, String msg){
-        this(true, msg);
+        this(TaskResult.SUCCESS, msg);
         this.data = data;
     }
 
-    private WebServiceTaskResult(boolean result, String msg) {
-        this(result, msg, null);
+    private WebServiceTaskResult(TaskResult taskResult) {
+        this(taskResult, null, null);
     }
-
-    private WebServiceTaskResult(boolean result) {
-        this(result, null, null);
+    private WebServiceTaskResult(TaskResult taskResult, String msg) {
+        this(taskResult, msg, null);
+    }
+    private WebServiceTaskResult(TaskResult taskResult, String msg, Throwable t) {
+        this.taskResult = taskResult;
+        this.message = msg;
+        this.exception = t;
     }
 
     public String getMessageForUser() {
@@ -67,13 +71,38 @@ public class WebServiceTaskResult<T> {
         return msg.toString();
     }
 
+    public TaskResult getTaskResult() {
+        return taskResult;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public boolean isCompletedWithoutError(){
+        switch (taskResult){
+            case SUCCESS:
+            case CACHED:
+                return true;
+            default:
+            case FAIL:
+                return false;
+        }
+    }
+
     public WebServiceTaskResult addResult(WebServiceTaskResult r) {
-        boolean result = this.result;
+        TaskResult taskResult = this.taskResult;
+        //boolean result = isCompletedWithoutError();
         String msg = this.message == null ? "" : this.message;
         Throwable t = this.exception;
 
-        if (!r.result) {
-            result = false;
+        if (!r.isCompletedWithoutError()) {
+            //result = false;
+            taskResult = TaskResult.FAIL;
         }
         if (r.message != null) {
             if (msg.length() != 0)
@@ -90,6 +119,6 @@ public class WebServiceTaskResult<T> {
                 t = r.exception;
             }
         }
-        return new WebServiceTaskResult(result, msg, t);
+        return new WebServiceTaskResult(taskResult, msg, t);
     }
 }

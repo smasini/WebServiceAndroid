@@ -13,7 +13,6 @@ public class WebServiceTask extends AsyncTask<Void, Integer, WebServiceTaskResul
 
     private WebServiceTaskListener webServiceTaskListener;
     private List<Operation> operations;
-    private WebServiceTaskResult result;
     private Context context;
     private boolean showDialog, hideDialog;
 
@@ -54,6 +53,7 @@ public class WebServiceTask extends AsyncTask<Void, Integer, WebServiceTaskResul
 
     @Override
     protected WebServiceTaskResult doInBackground(Void... params) {
+        WebServiceTaskResult mainResult = null;
         WebServiceSyncTask webServiceSyncTask = new WebServiceSyncTask();
         for(Operation operation : operations){
             WebServiceTaskResult result = null;
@@ -61,7 +61,7 @@ public class WebServiceTask extends AsyncTask<Void, Integer, WebServiceTaskResul
             if(operation instanceof Cachable){
                 Cachable cachable = (Cachable)operation;
                 if(cachable.isDataAlreadyCached()){
-                    result = WebServiceTaskResult.ok;
+                    result = WebServiceTaskResult.cached();
                     handled = true;
                 }
             }
@@ -73,22 +73,24 @@ public class WebServiceTask extends AsyncTask<Void, Integer, WebServiceTaskResul
                 }
             }
             if(result!=null){
-                if(result.result || this.result == null){
-                    this.result = result;
+                if(mainResult == null){
+                    mainResult = result;
+                }else{
+                    mainResult.addResult(result);
                 }
             }
         }
-        return result;
+        return mainResult;
     }
 
     @Override
-    protected void onPostExecute(WebServiceTaskResult risultato) {
-        super.onPostExecute(risultato);
-        if (webServiceTaskListener != null) {
-            webServiceTaskListener.onWebServiceTaskCompletato(risultato);
-        }
-        if(!risultato.result || hideDialog)
+    protected void onPostExecute(WebServiceTaskResult result) {
+        super.onPostExecute(result);
+        if(hideDialog)
             WebService.getInstance().hideDialog();
+        if (webServiceTaskListener != null) {
+            webServiceTaskListener.onWebServiceTaskCompletato(result);
+        }
     }
 
     public void setWebServiceTaskListener(WebServiceTaskListener webServiceTaskListener) {

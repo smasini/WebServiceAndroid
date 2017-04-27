@@ -42,7 +42,7 @@ public class WebServiceSyncTask {
                 InputStream errorStream = urlConnection.getErrorStream();
                 result = operation.onFail(statuCode, t, errorStream);
             }
-            if(result != null && result.result && operation instanceof Cachable){
+            if(operation instanceof Cachable && result != null && result.isCompletedWithoutError()){
                 Cachable cachable = (Cachable)operation;
                 cachable.setCacheData();
             }
