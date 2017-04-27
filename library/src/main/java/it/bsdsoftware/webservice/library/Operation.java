@@ -32,7 +32,7 @@ import cz.msebera.android.httpclient.entity.mime.content.FileBody;
 public abstract class Operation {
 
     public WebServiceTaskResult onSuccess(String response){
-        return WebServiceTaskResult.ok;
+        return WebServiceTaskResult.success();
     }
     public abstract WebServiceTaskResult onSuccess(int statusCode, InputStream inputStream);
     public abstract MethodType getMethodType();
