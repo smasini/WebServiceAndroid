@@ -5,5 +5,16 @@ package it.bsdsoftware.webservice.library;
  */
 public enum MethodType {
     POST,
-    GET
+    GET,
+    PUT,
+    DELETE;
+
+    public String name;
+
+    static {
+        POST.name = "POST";
+        GET.name = "GET";
+        PUT.name = "PUT";
+        DELETE.name = "DELETE";
+    }
 }

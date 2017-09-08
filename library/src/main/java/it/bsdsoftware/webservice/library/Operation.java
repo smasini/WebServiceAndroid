@@ -47,8 +47,10 @@ public abstract class Operation {
 
         try {
             Uri uri = Uri.parse(url);
-            switch (getMethodType()){
+            MethodType methodType = getMethodType();
+            switch (methodType){
                 case GET:
+                case DELETE:
                     Uri.Builder builder = uri.buildUpon();
                     if(params!=null){
                         Iterator it = params.entrySet().iterator();
@@ -60,14 +62,15 @@ public abstract class Operation {
                     }
                     URL myUrl = new URL(builder.toString());
                     connection = (HttpURLConnection) myUrl.openConnection();
-                    connection.setRequestMethod("GET");
+                    connection.setRequestMethod(methodType.name);
 
                     connection = setHeaders(connection);
                     break;
                 case POST:
+                case PUT:
                     myUrl = new URL(url);
                     connection = (HttpURLConnection) myUrl.openConnection();
-                    connection.setRequestMethod("POST");
+                    connection.setRequestMethod(methodType.name);
                     connection = setHeaders(connection);
 
                     JSONObject jsonObject = new JSONObject();
@@ -80,8 +83,7 @@ public abstract class Operation {
                         }
                     }
                     OutputStream os = connection.getOutputStream();
-                    BufferedWriter writer = new BufferedWriter(
-                            new OutputStreamWriter(os, getCharset()));
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, getCharset()));
                     writer.write(jsonObject.toString());
                     writer.flush();
                     writer.close();
