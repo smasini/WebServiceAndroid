@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 14
@@ -27,9 +27,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5.1'
-    /*compile('org.apache.httpcomponents:httpmime:4.3') {
-        exclude module: "httpclient"
-    }*/
     compile group: 'cz.msebera.android' , name: 'httpclient', version: '4.4.1.1'
 }
 
@@ -47,7 +44,7 @@ publish {
     userOrg = 'smasini'
     groupId = 'it.smasini'
     artifactId = 'android-webservice'
-    publishVersion = '1.5'
+    publishVersion = '1.9'
     website = 'https://github.com/smasini/WebServiceAndroid'
     repository = 'https://github.com/smasini/WebServiceAndroid.git'
     bintrayUser = 'smasini'

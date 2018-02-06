@@ -70,19 +70,9 @@ public abstract class Operation {
                     connection.setRequestMethod("POST");
                     connection = setHeaders(connection);
 
-                    JSONObject jsonObject = new JSONObject();
-                    if(params!=null){
-                        Iterator it = params.entrySet().iterator();
-                        while (it.hasNext()) {
-                            Map.Entry pair = (Map.Entry) it.next();
-                            jsonObject.put((String)pair.getKey(),pair.getValue());
-                            it.remove();
-                        }
-                    }
                     OutputStream os = connection.getOutputStream();
-                    BufferedWriter writer = new BufferedWriter(
-                            new OutputStreamWriter(os, getCharset()));
-                    writer.write(jsonObject.toString());
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, getCharset()));
+                    writer.write(getPostPayload(params));
                     writer.flush();
                     writer.close();
                     os.close();
@@ -92,6 +82,23 @@ public abstract class Operation {
             throw new RuntimeException(t);
         }
         return connection;
+    }
+
+    protected String getPostPayload(HashMap<String, Object> params){
+        JSONObject jsonObject = new JSONObject();
+        if(params!=null){
+            Iterator it = params.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                try {
+                    jsonObject.put((String)pair.getKey(),pair.getValue());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                it.remove();
+            }
+        }
+        return jsonObject.toString();
     }
 
     public HttpURLConnection setHeaders(HttpURLConnection connection){

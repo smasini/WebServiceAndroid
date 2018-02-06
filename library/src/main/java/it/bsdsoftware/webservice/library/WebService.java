@@ -1,6 +1,8 @@
 package it.bsdsoftware.webservice.library;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 /**
  * Created by Simone on 30/06/16.
@@ -17,40 +19,61 @@ public class WebService {
     }
 
     public static void init(WebServiceBuilder builder){
-        if(builder.baseUrlTest == null || builder.baseUrlTest.equals("")){
-            instance = new WebService(builder.baseUrl);
-        }else{
-            instance = new WebService(builder.baseUrl, builder.baseUrlTest);
-        }
+        instance = new WebService(builder.baseUrlProduction, builder.baseUrlTest, builder.baseUrlStaging, builder.baseUrlLocal, builder.baseUrlDemo);
+        instance.setContext(builder.context);
         instance.setUrlType(builder.urlType);
         instance.setDialogInterface(builder.dialogInterface);
+        instance.setBaseUrlHandled(builder.baseUrlHandled);
+        instance.restoreHandled();
     }
 
-    private String baseUrl, baseUrlTest;
+    private String baseUrlProduction, baseUrlTest, baseUrlStaging, baseUrlLocal, baseUrlDemo, baseUrlHandled;
     private UrlType urlType;
     private DialogInterface dialogInterface;
+    private Context context;
 
-    private WebService(String baseUrl, String baseUrlTest)
-    {
-        this.baseUrl = baseUrl;
+    private WebService(String baseUrlProduction, String baseUrlTest, String baseUrlStaging, String baseUrlLocal, String baseUrlDemo) {
+        this.baseUrlProduction = baseUrlProduction;
         this.baseUrlTest = baseUrlTest;
-    }
-
-    private WebService(String baseUrl)
-    {
-        this.baseUrl = baseUrl;
+        this.baseUrlStaging = baseUrlStaging;
+        this.baseUrlLocal = baseUrlLocal;
+        this.baseUrlDemo = baseUrlDemo;
     }
 
     public void setUrlType(UrlType urlType) {
         this.urlType = urlType;
     }
 
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public void setBaseUrlProduction(String baseUrlProduction) {
+        this.baseUrlProduction = baseUrlProduction;
+    }
+
+    public void setBaseUrlStaging(String baseUrlStaging) {
+        this.baseUrlStaging = baseUrlStaging;
+    }
+
+    public void setBaseUrlLocal(String baseUrlLocal) {
+        this.baseUrlLocal = baseUrlLocal;
+    }
+
+    public void setBaseUrlDemo(String baseUrlDemo) {
+        this.baseUrlDemo = baseUrlDemo;
     }
 
     public void setBaseUrlTest(String baseUrlTest) {
         this.baseUrlTest = baseUrlTest;
+    }
+
+    public void setBaseUrlHandled(String baseUrlHandled) {
+        this.baseUrlHandled = baseUrlHandled;
+        if(baseUrlHandled!=null && !baseUrlHandled.isEmpty()){
+            saveHandled();
+            urlType = UrlType.HANDLED;
+        }
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
     }
 
     public void setDialogInterface(DialogInterface dialogInterface) {
@@ -60,23 +83,61 @@ public class WebService {
     public String getUrl(){
         String url = null;
         switch (urlType){
-            case PRODUCTION:
-                url = baseUrl;
-                break;
             case TEST:
                 url = baseUrlTest;
+                break;
+            case LOCAL:
+                url = baseUrlLocal;
+                break;
+            case STAGING:
+                url = baseUrlStaging;
+                break;
+            case PRODUCTION:
+                url = baseUrlProduction;
+                break;
+            case DEMO:
+                url = baseUrlDemo;
+                break;
+            case HANDLED:
+                url = baseUrlHandled;
                 break;
         }
         if(url!=null){
             return url;
         }
-        if(baseUrl!=null && !baseUrl.equals("")){
-            return baseUrl;
+        if(baseUrlProduction!=null && !baseUrlProduction.equals("")){
+            return baseUrlProduction;
+        }
+        if(baseUrlStaging!=null && !baseUrlStaging.equals("")){
+            return baseUrlStaging;
         }
         if(baseUrlTest!=null && !baseUrlTest.equals("")){
             return baseUrlTest;
         }
+        if(baseUrlDemo!=null && !baseUrlDemo.equals("")){
+            return baseUrlDemo;
+        }
+        if(baseUrlLocal!=null && !baseUrlLocal.equals("")){
+            return baseUrlLocal;
+        }
         throw new RuntimeException("Non è stato impostato nessun baseUrl");
+    }
+
+    private void saveHandled(){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        sp.edit().putString("base_url_handled_key", baseUrlHandled).apply();
+    }
+
+    private void restoreHandled(){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        baseUrlHandled = sp.getString("base_url_handled_key", getUrl());
+        if(baseUrlHandled!=null && !baseUrlHandled.isEmpty()){
+            urlType = UrlType.HANDLED;
+        }
+    }
+
+    public void resetToProduction(){
+        setBaseUrlHandled(baseUrlProduction);
     }
 
     public void showDialog(Context context){
@@ -90,5 +151,4 @@ public class WebService {
             dialogInterface.hideDialog();
         }
     }
-
 }
